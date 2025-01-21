@@ -67,15 +67,14 @@ uint8_t readWhoAmI(I2C_Handle i2cHandle, uint8_t device_addr)
 }
 
 // Funkcja do konfiguracji LIS2DTW12
-// Domyślne ustawienia: ODR = 100 Hz, FS = ±2g TO DO
-void configureLIS2DTW12(I2C_Handle i2cHandle, uint8_t device_addr)
+void configureLIS2DTW12(I2C_Handle i2cHandle, uint8_t device_addr, CTRL_DATA_RATE_CONFIGURATION dataRate, CTRL_MODE mode, LP_MODE lpMode)
 {
     I2C_Transaction i2cTransaction;
     uint8_t txBuffer[2];
 
     // Ustawienia w CTRL1: ODR = 100 Hz, FS = ±2g
     txBuffer[0] = 0x20; // Adres rejestru CTRL1
-    txBuffer[1] = 0x50; // ODR = 100 Hz, FS = ±2g
+    txBuffer[1] = (dataRate << 4) | (mode << 2) | lpMode;
     i2cTransaction.slaveAddress = device_addr;
     i2cTransaction.writeBuf = txBuffer;
     i2cTransaction.writeCount = 2;
@@ -143,10 +142,10 @@ void StartFaceUp(struct accelerometer_data *accelerometer)
         return;
     }
     int16_t buffer[];
-    // TUTAJ URUCHAMIAM WĄTEK
+    // Sprawdzenie identyfikatora urządzenia
     if (readWhoAmI(accelerometer.i2cHandle, accelerometer.device_addr) == 0x44)
     {
-        configureLIS2DTW12();
+        configureLIS2DTW12(accelerometer01.i2cHandle, accelerometer01.device_addr, HP_LP_100_HZ, HIGH_PERFORMANCE, LP_MODE_1);
 
         while (1)
         {
