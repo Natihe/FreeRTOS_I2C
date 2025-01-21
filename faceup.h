@@ -1,3 +1,5 @@
+#ifndef __IG_FACEUP_H__
+#define __IG_FACEUP_H__
 
 // Zmienna do przechowywania informacji o stanie (face-up/face-down)
 typedef enum
@@ -45,3 +47,5 @@ typedef enum LP_Mode
     LP_MODE_3 = 0x2, // 10 Low-power mode 3 (14bit resolution)
     LP_MODE_4 = 0x3  // 11 Low-power mode 4 (14bit resolution)
 } LP_MODE;
+
+#endif // __IG_FACEUP_H__
