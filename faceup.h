@@ -8,6 +8,12 @@ typedef enum
     FACE_DOWN
 } face_status_t;
 
+typedef enum SensorStatus
+{
+    SENSOR_OK,
+    SENSOR_ERROR
+} SENSOR_STATUS;
+
 typedef void (*callback_t)(struct accelerometer_data *accelerometer);
 
 struct accelerometer_data
@@ -17,6 +23,7 @@ struct accelerometer_data
     callback_t callback;
     bool up;
     int16_t x, y, z;
+    SENSOR_STATUS status;
 };
 
 typedef enum CTRLDataRateConfiguration
