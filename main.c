@@ -27,7 +27,9 @@ static struct accelerometer_data accelerometer01;
 static struct accelerometer_data accelerometer02;
 
 /**
- * @brief Initializes the I2C master interface.
+ * @brief 
+ * 
+ */ @brief Initializes the I2C master interface.
  *
  * This function sets up the I2C master interface with the necessary
  * configurations such as clock speed, GPIO pins, and other relevant
@@ -152,19 +154,25 @@ void i2c_communicate(struct accelerometer_data *accelerometer)
 
     txBuffer[0] = 0x28 | 0x80; // Adres OUTX_L z ustawieniem bitu inkrementacji
 
-    i2cTransaction.slaveAddress = device_addr;
+    i2cTransaction.slaveAddress = accelerometer->device_addr;
     i2cTransaction.writeBuf = txBuffer;
     i2cTransaction.writeCount = 1;
     i2cTransaction.readBuf = rxBuffer;
     i2cTransaction.readCount = 6;
 
-    if (I2C_transfer(i2cHandle, &i2cTransaction))
+    if (I2C_transfer(accelerometer->i2cHandle, &i2cTransaction))
     {
         // Składanie wartości 16-bitowych
-        *x = (int16_t)((rxBuffer[1] << 8) | rxBuffer[0]);
-        *y = (int16_t)((rxBuffer[3] << 8) | rxBuffer[2]);
-        *z = (int16_t)((rxBuffer[5] << 8) | rxBuffer[4]);
-        printf("X: %d, Y: %d, Z: %d\n", *x, *y, *z);
+        int16_t raw_x = (int16_t)((rxBuffer[1] << 8) | rxBuffer[0]);
+        int16_t raw_y = (int16_t)((rxBuffer[3] << 8) | rxBuffer[2]);
+        int16_t raw_z = (int16_t)((rxBuffer[5] << 8) | rxBuffer[4]);
+
+        // Przeliczanie na jednostki g
+        float x = convert_to_g(raw_x, 2, 14); // Zakres 2g, rozdzielczość 14-bitowa
+        float y = convert_to_g(raw_y, 2, 14);
+        float z = convert_to_g(raw_z, 2, 14);
+
+        printf("X: %f g, Y: %f g, Z: %f g\n", x, y, z);
     }
     else
     {
