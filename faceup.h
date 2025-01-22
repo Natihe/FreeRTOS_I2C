@@ -1,18 +1,6 @@
 #ifndef __IG_FACEUP_H__
 #define __IG_FACEUP_H__
-
-// Zmienna do przechowywania informacji o stanie (face-up/face-down)
-typedef enum
-{
-    FACE_UP,
-    FACE_DOWN
-} face_status_t;
-
-typedef enum SensorStatus
-{
-    SENSOR_OK,
-    SENSOR_ERROR
-} SENSOR_STATUS;
+#include "I2C.h"
 
 typedef void (*callback_t)(struct accelerometer_data *accelerometer);
 
@@ -45,17 +33,25 @@ typedef enum LP_Mode
     LP_MODE_4 = 0x3  // 11 Low-power mode 4 (14bit resolution)
 } LP_MODE;
 
+typedef enum
+{
+    FACE_UNKNOWN,
+    FACE_UP,
+    FACE_DOWN
+} face_status_t;
+
 struct accelerometer_data
 {
     uint8_t device_addr;
     I2C_Handle i2cHandle;
-    callback_t callback;
-    bool up;
-    int16_t x, y, z;
     CTRL_DATA_RATE_CONFIGURATION CTRLDataRateConfiguration = HP_LP_50_HZ;
     CTRL_MODE ctrlMode = HIGH_PERFORMANCE;
     LP_MODE lpMode = LP_MODE_4;
-    SENSOR_STATUS status;
+    callback_t callback;
+    float x, y, z;
+    face_status_t current_status;
+    face_status_t last_stable_status;
+    TickType_t stable_start_time;
 };
 
 #endif // __IG_FACEUP_H__
