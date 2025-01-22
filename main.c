@@ -80,7 +80,13 @@ void i2c_master_init()
     }
 }
 
-
+/**
+ * @brief Detects the face status based on accelerometer data.
+ *
+ * This function analyzes the data from the accelerometer to determine the face status.
+ *
+ * @param accelerometer A pointer to a structure containing accelerometer data.
+ */
 void detect_face_status(struct accelerometer_data *accelerometer)
 {
     TickType_t current_time = xTaskGetTickCount();
@@ -125,7 +131,15 @@ void detect_face_status(struct accelerometer_data *accelerometer)
     }
 }
 
-// Zadanie do obsługi czujnika
+
+/**
+ * @brief Starts the FaceUp detection process using accelerometer data.
+ *
+ * This function initializes and starts the process of detecting if the device
+ * is facing up based on the provided accelerometer data.
+ *
+ * @param accelerometer Pointer to a structure containing accelerometer data.
+ */
 void StartFaceUp(struct accelerometer_data *accelerometer)
 {
     if (accelerometer == NULL)
