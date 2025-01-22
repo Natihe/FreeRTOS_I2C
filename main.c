@@ -12,6 +12,7 @@
 
 // #include <stdio.h>
 #include "faceup.h"
+#include <stdint.h>
 #include <FreeRTOS.h>
 #include <I2C.h>
 
@@ -20,16 +21,14 @@
 #define SCALE_8G 4096.0f
 #define SCALE_16G 2048.0f
 
-#define FACE_UP_THRESHOLD 1.0    // Przykładowy próg dla stanu face-up
-#define FACE_DOWN_THRESHOLD -1.0 // Przykładowy próg dla stanu face-down
+#define FACE_UP_THRESHOLD 0.5f    // Przykładowy próg dla stanu face-up
+#define FACE_DOWN_THRESHOLD -0.5f // Przykładowy próg dla stanu face-down
 
 static struct accelerometer_data accelerometer01;
 static struct accelerometer_data accelerometer02;
 
 /**
- * @brief 
- * 
- */ @brief Initializes the I2C master interface.
+ * @brief Initializes the I2C master interface.
  *
  * This function sets up the I2C master interface with the necessary
  * configurations such as clock speed, GPIO pins, and other relevant
@@ -217,23 +216,50 @@ float convert_to_g(int16_t raw_data, uint8_t range, uint8_t resolution)
 
     return raw_data * sensitivity;
 }
-// Funkcja wykrywająca stan face-up/face-down
-void detect_face_status(float accel_data, face_status_t *status)
+
+void detect_face_status(float accel_z, float accel_x, float accel_y, face_detection_t *face_detection)
 {
-    if (accel_data > FACE_UP_THRESHOLD)
+    time_t current_time = time(NULL);
+
+    // Check for minimal movement in X/Y direction
+    if (fabs(accel_x) < MOVEMENT_THRESHOLD && fabs(accel_y) < MOVEMENT_THRESHOLD)
     {
-        *status = FACE_UP;
+        if (accel_z > FACE_UP_THRESHOLD)
+        {
+            if (face_detection->current_status != FACE_UP)
+            {
+                face_detection->current_status = FACE_UP;
+                face_detection->stable_start_time = current_time;
+            }
+            else if (difftime(current_time, face_detection->stable_start_time) >= STABLE_DURATION)
+            {
+                face_detection->last_stable_status = FACE_UP;
+            }
+        }
+        else if (accel_z < FACE_DOWN_THRESHOLD)
+        {
+            if (face_detection->current_status != FACE_DOWN)
+            {
+                face_detection->current_status = FACE_DOWN;
+                face_detection->stable_start_time = current_time;
+            }
+            else if (difftime(current_time, face_detection->stable_start_time) >= STABLE_DURATION)
+            {
+                face_detection->last_stable_status = FACE_DOWN;
+            }
+        }
     }
-    else if (accel_data < FACE_DOWN_THRESHOLD)
+    else
     {
-        *status = FACE_DOWN;
+        // Reset if there is significant movement in X/Y direction
+        face_detection->current_status = FACE_UNKNOWN;
+        face_detection->stable_start_time = current_time;
     }
 }
 
 // Zadanie do obsługi czujnika
 void StartFaceUp(struct accelerometer_data *accelerometer)
 {
-
     if (accelerometer == NULL)
     {
         EroorHalnder();
@@ -275,5 +301,6 @@ int main()
     xTaskCreate(StartFaceUp(&accelerometer01), "Sensor Task 1", 2048, NULL, 5, NULL);
     xTaskCreate(StartFaceUp(&accelerometer02), "Sensor Task 2", 2048, NULL, 5, NULL);
 
+    vTaskStartScheduler();
     return 0;
 }

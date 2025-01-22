@@ -16,19 +16,6 @@ typedef enum SensorStatus
 
 typedef void (*callback_t)(struct accelerometer_data *accelerometer);
 
-struct accelerometer_data
-{
-    uint8_t device_addr;
-    I2C_Handle i2cHandle;
-    callback_t callback;
-    bool up;
-    int16_t x, y, z;
-    CTRL_DATA_RATE_CONFIGURATION CTRLDataRateConfiguration = HP_LP_50_HZ;
-    CTRL_MODE ctrlMode = HIGH_PERFORMANCE;
-    LP_MODE lpMode = LP_MODE_4;
-    SENSOR_STATUS status;
-};
-
 typedef enum CTRLDataRateConfiguration
 {
     POWER_DOWN = 0x00,        // 0000 Power-down
@@ -57,5 +44,18 @@ typedef enum LP_Mode
     LP_MODE_3 = 0x2, // 10 Low-power mode 3 (14bit resolution)
     LP_MODE_4 = 0x3  // 11 Low-power mode 4 (14bit resolution)
 } LP_MODE;
+
+struct accelerometer_data
+{
+    uint8_t device_addr;
+    I2C_Handle i2cHandle;
+    callback_t callback;
+    bool up;
+    int16_t x, y, z;
+    CTRL_DATA_RATE_CONFIGURATION CTRLDataRateConfiguration = HP_LP_50_HZ;
+    CTRL_MODE ctrlMode = HIGH_PERFORMANCE;
+    LP_MODE lpMode = LP_MODE_4;
+    SENSOR_STATUS status;
+};
 
 #endif // __IG_FACEUP_H__
