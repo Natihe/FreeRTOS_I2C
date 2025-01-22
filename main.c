@@ -243,7 +243,7 @@ void StartFaceUp(struct accelerometer_data *accelerometer)
     // Sprawdzenie identyfikatora urządzenia
     if (readWhoAmI(accelerometer.i2cHandle, accelerometer.device_addr) == 0x44)
     {
-        configureLIS2DTW12(accelerometer01.i2cHandle, accelerometer01.device_addr, HP_LP_100_HZ, HIGH_PERFORMANCE, LP_MODE_1);
+        configureLIS2DTW12(accelerometer.i2cHandle, accelerometer.device_addr, accelerometer.CTRLDataRateConfiguration, accelerometer.ctrlMode, accelerometer.lpMode);
 
         while (1)
         {
@@ -259,11 +259,18 @@ int main()
 {
     // Inicjalizacja obu magistrali I2C
     i2c_master_init();
-
+    // Konfiguracja czujników
     accelerometer01.i2cHandle = i2cHandle0;
     accelerometer01.device_addr = 0x18;
+    accelerometer01.ctrlMode = HIGH_PERFORMANCE;
+    accelerometer01.lpMode = LP_MODE_4;
+    accelerometer01.CTRLDataRateConfiguration = HP_LP_50_HZ;
+
     accelerometer02.i2cHandle = i2cHandle1;
     accelerometer02.device_addr = 0x19;
+    accelerometer02.ctrlMode = HIGH_PERFORMANCE;
+    accelerometer02.lpMode = LP_MODE_4;
+    accelerometer02.CTRLDataRateConfiguration = HP_LP_50_HZ;
 
     xTaskCreate(StartFaceUp(&accelerometer01), "Sensor Task 1", 2048, NULL, 5, NULL);
     xTaskCreate(StartFaceUp(&accelerometer02), "Sensor Task 2", 2048, NULL, 5, NULL);

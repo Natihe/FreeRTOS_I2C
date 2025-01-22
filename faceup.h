@@ -23,6 +23,9 @@ struct accelerometer_data
     callback_t callback;
     bool up;
     int16_t x, y, z;
+    CTRL_DATA_RATE_CONFIGURATION CTRLDataRateConfiguration = HP_LP_50_HZ;
+    CTRL_MODE ctrlMode = HIGH_PERFORMANCE;
+    LP_MODE lpMode = LP_MODE_4;
     SENSOR_STATUS status;
 };
 
