@@ -207,8 +207,8 @@ int main()
     accelerometer02.CTRLDataRateConfiguration = HP_LP_50_HZ;
     
     // Stworzenie zadań dla obu czujników
-    xTaskCreate(&StartFaceUp, "Sensor Task 1", 2048, &accelerometer01, 5, NULL);
-    xTaskCreate(&StartFaceUp, "Sensor Task 2", 2048, &accelerometer02, 5, NULL);
+    xTaskCreate(StartFaceUp, "Sensor Task 1", 2048, &accelerometer01, 5, NULL);
+    xTaskCreate(StartFaceUp, "Sensor Task 2", 2048, &accelerometer02, 5, NULL);
     
     // Rozpoczęcie planisty
     vTaskStartScheduler();
