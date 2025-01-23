@@ -75,7 +75,6 @@ bool configureLIS2DTW12(struct accelerometer_data *accelerometer)
         return false;
     }
     result = readWhoAmI(accelerometer->i2cHandle, accelerometer->device_addr) == 0x44;
-    accelerometer->callback = &accStateChanged;
     return result;
 }
 
