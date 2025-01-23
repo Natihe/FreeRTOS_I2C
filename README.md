@@ -4,7 +4,7 @@ Program to run two LIS2DTW12 sensors in redundancy with usage of FreeRTOS
 
 # Design model
 ## Design assumptions
-The system uses two separate I2C buses to communicate with the accelerometers. This approach enhances redundancy and ensures that a failure in one bus does not affect the other sensor's operation.
+The system uses two separate I2C buses to communicate with the accelerometers. This approach enhances redundancy and ensures that a failure in one bus does not affect the other sensor's operation. The system utilizes FreeRTOS to manage tasks for each sensor independently. To prevent collisions, a mutex is used to ensure exclusive access to the I2C bus when communicating with the sensors. Additionally, a callback function is implemented to return information about changes in the accelerometer's state.
 
 ## Functional Layer
 

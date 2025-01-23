@@ -36,9 +36,19 @@ static struct accelerometer_data accelerometer02;
 // Mutex handle.
 SemaphoreHandle_t xMutex;
 
+
+/**
+ * @brief Callback function to handle changes in accelerometer state.
+ *
+ * This function is called whenever there is a change in the state of the accelerometer.
+ * It processes the new accelerometer data and performs necessary actions based on the
+ * updated state.
+ *
+ * @param accelerometer Pointer to a structure containing the accelerometer data.
+ */
 void accStateChanged(struct accelerometer_data *accelerometer)
 {
-    printf("State changed\n");
+    printf("Accelerometer at address 0x%02X changed state from %d to %d\n", accelerometer->device_addr, accelerometer->last_stable_status, accelerometer->current_status);
 }
 
 /**
@@ -174,13 +184,15 @@ int main()
 {
     // Inicjalizacja obu magistrali I2C
     i2c_master_init();
-    xMutex = xSemaphoreCreateMutex();
+
+    // Utworzenie mutexu
     xMutex = xSemaphoreCreateMutex();
     if (xMutex == NULL)
     {
         printf("Failed to create mutex.\n");
         return 1; // Exit if mutex creation fails.
     }
+
     // Konfiguracja czujników
     accelerometer01.i2cHandle = i2cHandle0;
     accelerometer01.device_addr = 0x18;
@@ -193,10 +205,12 @@ int main()
     accelerometer02.ctrlMode = HIGH_PERFORMANCE;
     accelerometer02.lpMode = LP_MODE_4;
     accelerometer02.CTRLDataRateConfiguration = HP_LP_50_HZ;
-
+    
+    // Stworzenie zadań dla obu czujników
     xTaskCreate(StartFaceUp(&accelerometer01), "Sensor Task 1", 2048, NULL, 5, NULL);
     xTaskCreate(StartFaceUp(&accelerometer02), "Sensor Task 2", 2048, NULL, 5, NULL);
-
+    
+    // Rozpoczęcie planisty
     vTaskStartScheduler();
     return 0;
 }

@@ -102,18 +102,26 @@ void i2c_communicate(struct accelerometer_data *accelerometer)
     i2cTransaction.writeCount = 1;
     i2cTransaction.readBuf = rxBuffer;
     i2cTransaction.readCount = 6;
-
+    uint8_t accResolution = 0;
     if (I2C_transfer(accelerometer->i2cHandle, &i2cTransaction))
     {
         // Składanie wartości 16-bitowych BigEndian
         int16_t raw_x = (int16_t)((rxBuffer[1] << 8) | rxBuffer[0]);
         int16_t raw_y = (int16_t)((rxBuffer[3] << 8) | rxBuffer[2]);
         int16_t raw_z = (int16_t)((rxBuffer[5] << 8) | rxBuffer[4]);
-
+        
+        if(accelerometer->lpMode != LP_MODE_1)
+        {
+            resolution = 14;
+        }
+        else
+        {
+            resolution = 12;
+        }
         // Przeliczanie na jednostki g
-        accelerometer->x = convert_to_g(raw_x, 2, 14); // Zakres 2g, rozdzielczość 14-bitowa
-        accelerometer->y = convert_to_g(raw_y, 2, 14);
-        accelerometer->z = convert_to_g(raw_z, 2, 14);
+        accelerometer->x = convert_to_g(raw_x, 2, accResolution);
+        accelerometer->y = convert_to_g(raw_y, 2, accResolution);
+        accelerometer->z = convert_to_g(raw_z, 2, accResolution);
 
         printf("X: %f g, Y: %f g, Z: %f g\n", x, y, z);
     }
