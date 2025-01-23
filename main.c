@@ -150,8 +150,9 @@ void detect_face_status(struct accelerometer_data *accelerometer)
  *
  * @param accelerometer Pointer to a structure containing accelerometer data.
  */
-void StartFaceUp(struct accelerometer_data *accelerometer)
+void StartFaceUp(void *pvParameters)
 {
+    struct accelerometer_data *accelerometer = (struct accelerometer_data *)pvParameters;
     if (accelerometer == NULL)
     {
         EroorHalnder();
@@ -207,9 +208,8 @@ int main()
     accelerometer02.CTRLDataRateConfiguration = HP_LP_50_HZ;
     
     // Stworzenie zadań dla obu czujników
-    xTaskCreate(StartFaceUp, "Sensor Task 1", 2048, &accelerometer01, 5, NULL);
-    xTaskCreate(StartFaceUp, "Sensor Task 2", 2048, &accelerometer02, 5, NULL);
-    
+    xTaskCreate(StartFaceUp, "Sensor Task 1", 2048, (void *)&accelerometer01, 5, NULL);
+    xTaskCreate(StartFaceUp, "Sensor Task 2", 2048, (void *)&accelerometer02, 5, NULL);
     // Rozpoczęcie planisty
     vTaskStartScheduler();
     return 0;
