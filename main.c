@@ -207,6 +207,8 @@ int main()
     accelerometer02.lpMode = LP_MODE_4;
     accelerometer02.CTRLDataRateConfiguration = HP_LP_50_HZ;
     
+    accelerometer01.callback = accStateChanged;
+    accelerometer02.callback = accStateChanged;
     // Stworzenie zadań dla obu czujników
     xTaskCreate(StartFaceUp, "Sensor Task 1", 2048, (void *)&accelerometer01, 5, NULL);
     xTaskCreate(StartFaceUp, "Sensor Task 2", 2048, (void *)&accelerometer02, 5, NULL);
